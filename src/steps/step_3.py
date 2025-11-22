@@ -7,41 +7,52 @@ from utils import clean_df
 from components.chat_model import chat_model
 
 
-class RelevantFocusArea(TypedDict):
-    relevant_focus_areas: str
+class RelevantPolicyDocument(TypedDict):
+    relevant_existing_policy_document_titles: Annotated[str, "Relevant existing policy document titles separated by ','"]
 
 prompt_template = PromptTemplate(
-    template='''
-    You will be given 2 strings 
-    relevant_policy_document_titles: It is basically a list of policy documents, separated by ","
-    list_of_focus_areas: It is a list of focus areas. This list may include some focus areas which are not at all related to any document titles.
-    Now you need to return a subset of list_of_focus_areas, MUST be separated by comma(",") 
-    which is relevant to atleaset one of the relevant policy documents.
-    Here is the list of relevant policy document titles
-    {relevant_policy_document_titles}
-    Here is the list of focus areas
-    {focus_areas}
-    ''',
-    input_variables=['relevant_policy_document_titles', 'focus_areas']
+    template="""
+    You will be given 2 strings
+
+    existing_policy_document_titles: It is a string of policy document titles separated by ",".
+    new_policy_document_title: It is a string of a single policy document title.
+    
+    Now you need to return a subset of existing_policy_document_titles separated by "," 
+    which semantically match exactly same as the new_policy_document_title.
+    
+    Here is the existing policy document titles
+    {existing_policy_document_titles}
+    
+    Here is the new policy document title
+    {new_policy_document_title}
+    
+    Rules: Please provide entire title of the existing document not only the id or only the title.
+    Example 'VI-301: Commercial Vehicle Insurance Package'
+    """,
+    input_variables=['existing_policy_document_titles', 'new_policy_document_title']
 )
+
 
 def step_3(state: State) -> Dict:
     '''
+    This node filters the existing policy document titles in global sop list dataframe based on the site document title.
     '''
-
-    filtered_global_sop_list_table_as_df = state.get('filtered_global_sop_list_table_as_df')
     
-    structured_model = chat_model.with_structured_output(RelevantFocusArea)
+    filtered_global_sop_list_table_as_df = state.get('filtered_global_sop_list_table_as_df')
+    site_document_title_table_as_df = state.get('site_document_title_table_as_df')
+
+    structured_model = chat_model.with_structured_output(RelevantPolicyDocument)
     chain = prompt_template | structured_model
 
     for idx, row in filtered_global_sop_list_table_as_df.iterrows():
-        focus_areas, relevant_policy_document_titles = row.iloc[1], row.iloc[2]
-        payload = { 'relevant_policy_document_titles': relevant_policy_document_titles , 'focus_areas': focus_areas }
+        existing_policy_document_titles = row.iloc[2].split(",")
+        new_policy_document_title = site_document_title_table_as_df.iloc[0, 1]
+        payload = { 'existing_policy_document_titles': existing_policy_document_titles , 'new_policy_document_title': new_policy_document_title }
         response = chain.invoke(payload)
-        filtered_global_sop_list_table_as_df.iloc[ idx, 1 ] = response.get('relevant_focus_areas')
+        filtered_global_sop_list_table_as_df.iloc[ idx, 2 ] = response.get('relevant_existing_policy_document_titles')
 
     filtered_global_sop_list_table_as_df = clean_df(filtered_global_sop_list_table_as_df)
-    print('Step 3 Completed: Global SOP Document Titles are filtered.')
+    print('Step 3 Completed: Global SOP Table Rows are filtered.')
 
-    # Along with removing the filtered focus areas, I can store those in the state as well for audit
+    # Along with removing the filtered titles, I can store those titles in the state as well for audit
     return { 'filtered_global_sop_list_table_as_df': filtered_global_sop_list_table_as_df }

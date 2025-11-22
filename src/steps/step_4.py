@@ -1,29 +1,48 @@
-from typing import Dict
+from typing import Dict, TypedDict, Annotated
+
+from langchain_core.prompts import PromptTemplate
 
 from state import State
-from components.parser import extract_pdf_elements
+from utils import clean_df
+from components.chat_model import chat_model
 
 
-# Another function similar to this is writtten in step 1. I need to make this DRY.
-def extract_site_document_content_from_pdf(filepath):
-    '''
-    Site Document PDF has exactly 4 parts
-    1. Title Table
-    2. Table of Contents
-    3. Section wise content
-    4. Document Versioning Table
+class RelevantFocusArea(TypedDict):
+    relevant_focus_areas: Annotated[str, "Relevant focus areas separated by ','"]
 
-    Point# 3 is the content we need to extract.
-    '''
-    elements = extract_pdf_elements(filepath)
-    site_document_content_element = elements[2: ]
-    site_document_content = '\n'.join([element.text for element in site_document_content_element])
-    return site_document_content
+prompt_template = PromptTemplate(
+    template='''
+    You will be given 2 strings 
+    relevant_policy_document_titles: It is basically a list of policy documents, separated by ","
+    list_of_focus_areas: It is a list of focus areas. This list may include some focus areas which are not at all related to any document titles.
+    Now you need to return a subset of list_of_focus_areas, MUST be separated by comma(",") 
+    which is relevant to atleaset one of the relevant policy documents.
+    Here is the list of relevant policy document titles
+    {relevant_policy_document_titles}
+    Here is the list of focus areas
+    {focus_areas}
+    ''',
+    input_variables=['relevant_policy_document_titles', 'focus_areas']
+)
 
 def step_4(state: State) -> Dict:
-    # In here, I can perform some more cleaning and chunking of the content.
-    site_document_content = extract_site_document_content_from_pdf(state.get('site_document_file_path'))
+    '''
+    This node filters the focus areas in global sop list dataframe based on the relevant policy document titles.
+    '''
 
-    print('Step 4 Completed: Site Document Content extracted.')
+    filtered_global_sop_list_table_as_df = state.get('filtered_global_sop_list_table_as_df')
+    
+    structured_model = chat_model.with_structured_output(RelevantFocusArea)
+    chain = prompt_template | structured_model
 
-    return { 'site_document_content': site_document_content }
+    for idx, row in filtered_global_sop_list_table_as_df.iterrows():
+        focus_areas, relevant_policy_document_titles = row.iloc[1], row.iloc[2]
+        payload = { 'relevant_policy_document_titles': relevant_policy_document_titles , 'focus_areas': focus_areas }
+        response = chain.invoke(payload)
+        filtered_global_sop_list_table_as_df.iloc[ idx, 1 ] = response.get('relevant_focus_areas')
+
+    filtered_global_sop_list_table_as_df = clean_df(filtered_global_sop_list_table_as_df)
+    print('Step 4 Completed: Global SOP Document Titles are filtered.')
+
+    # Along with removing the filtered focus areas, I can store those in the state as well for audit
+    return { 'filtered_global_sop_list_table_as_df': filtered_global_sop_list_table_as_df }

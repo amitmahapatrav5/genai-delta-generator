@@ -10,6 +10,7 @@ dependencies = [
     "langchain-community>=0.4.1",
     "langchain-huggingface>=1.0.1",
     "langchain-ollama>=1.0.0",
+    "langchain-perplexity>=1.0.0",
     "langgraph>=1.0.3",
     "notebook>=7.5.0",
     "pandas>=2.3.3",

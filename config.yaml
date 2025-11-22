@@ -2,5 +2,13 @@ data:
     global_sop_list_file_path: /Users/amitkumarmahapatra/Documents/projects/genai-delta-generator/data/global-sop.pdf
     site_document_file_path: /Users/amitkumarmahapatra/Documents/projects/genai-delta-generator/data/hdfc-ergo-health-insurance.pdf
 
-model:
-    repo_id: "google/gemma-2-9b-it"
+chat_model:
+    "ollama":
+        gemma_model: "gemma2:9b" # Very slow but best performance
+        qwen_model: "qwen2.5:1.5b" # Fast but very bad performance - cannot follow instructions properly
+        phi3_model: "phi3:mini" # Slow and not good performance - cannot follow instructions properly
+    "huggingface":
+        gemma_model: "google/gemma-2-9b-it" # Best Performance
+        gpt_oss_model: "openai/gpt-oss-20b"
+    "perplexity":
+        model: "sonar"

@@ -1,16 +1,33 @@
 from typing import Dict
 
 from state import State
+from components.parser import extract_pdf_elements
 
+
+# Another function similar to this is writtten in step 1. I need to make this DRY.
+def extract_site_document_content_from_pdf(filepath):
+    '''
+    Site Document PDF has exactly 4 parts
+    1. Title Table
+    2. Table of Contents
+    3. Section wise content
+    4. Document Versioning Table
+
+    Point# 3 is the content we need to extract.
+    '''
+    elements = extract_pdf_elements(filepath)
+    site_document_content_element = elements[2: ]
+    site_document_content = '\n'.join([element.text for element in site_document_content_element])
+    return site_document_content
 
 def step_5(state: State) -> Dict:
     '''
+    This node extracts the content from the site document pdf.
     '''
-    filtered_global_sop_list_table_as_df = state.get('filtered_global_sop_list_table_as_df')
-    delta_table_as_df = filtered_global_sop_list_table_as_df.copy()
-    delta_table_as_df["Status"] = ""
-    delta_table_as_df["Comments"] = ""
 
-    print('Step 5 Completed: Delta Table Initialized')
+    # In here, I can perform some more cleaning and chunking of the content.
+    site_document_content = extract_site_document_content_from_pdf(state.get('site_document_file_path'))
 
-    return { 'delta_table_as_df': delta_table_as_df }
+    print('Step 5 Completed: Site Document Content extracted.')
+
+    return { 'site_document_content': site_document_content }

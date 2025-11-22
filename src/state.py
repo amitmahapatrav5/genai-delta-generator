@@ -9,10 +9,10 @@ class State(TypedDict):
     # Step 1 State
     global_sop_list_table_as_df: pd.DataFrame
     site_document_title_table_as_df: pd.DataFrame
-    filtered_global_sop_list_table_as_df: pd.DataFrame
-    irrelevant_row_indices_in_global_sop_list_table_as_df: List[int]
 
     # Step 2 State
+    filtered_global_sop_list_table_as_df: pd.DataFrame
+    irrelevant_row_indices_in_global_sop_list_table_as_df: List[int]
 
     # Step 3 State
 
