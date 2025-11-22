@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from langchain_huggingface import ChatHuggingFace
 from langchain_huggingface import HuggingFaceEndpoint
 
-from utils import config
+from config import config
 
 load_dotenv()
 

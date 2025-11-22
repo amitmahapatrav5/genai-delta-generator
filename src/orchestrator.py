@@ -3,7 +3,7 @@ from typing import List, TypedDict, Dict
 from langgraph.graph import StateGraph, START, END
 
 from state import State
-from utils import config
+from config import config
 
 
 from steps.step_1 import step_1

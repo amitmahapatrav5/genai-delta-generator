@@ -29,7 +29,7 @@ prompt_template = PromptTemplate(
 )
 
 
-def step_6(state: State) -> dict:
+def step_6(state: State) -> Dict:
     '''
     
     '''
@@ -52,8 +52,8 @@ def step_6(state: State) -> dict:
             if response.get('included') == 'Partially':
                 comments.append(f'{focus_area}: {response.get("citation")}')
     
-    delta_table_as_df.iloc[idx, 3] = "\n".join(status)
-    delta_table_as_df.iloc[idx, 4] = "\n".join(comments)
+    delta_table_as_df.iloc[idx, 3] = "||".join(status)
+    delta_table_as_df.iloc[idx, 4] = "||".join(comments)
 
     print('Step 6 Completed: Delta Table Filled with Required Data')
 

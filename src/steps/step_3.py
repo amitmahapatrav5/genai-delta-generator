@@ -3,7 +3,9 @@ from typing import Dict, TypedDict, Annotated
 from langchain_core.prompts import PromptTemplate
 
 from state import State
+from utils import clean_df
 from components.chat_model import chat_model
+
 
 class RelevantFocusArea(TypedDict):
     relevant_focus_areas: str
@@ -38,6 +40,7 @@ def step_3(state: State) -> Dict:
         response = chain.invoke(payload)
         filtered_global_sop_list_table_as_df.iloc[ idx, 1 ] = response.get('relevant_focus_areas')
 
+    filtered_global_sop_list_table_as_df = clean_df(filtered_global_sop_list_table_as_df)
     print('Step 3 Completed: Global SOP Document Titles are filtered.')
 
     # Along with removing the filtered focus areas, I can store those in the state as well for audit

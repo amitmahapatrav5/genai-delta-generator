@@ -1,4 +1,4 @@
-from src.utils import get_comma_separated_list
+from utils import get_comma_separated_list
 from langchain_core.prompts import PromptTemplate
 
 result = get_comma_separated_list(

@@ -1,6 +1,6 @@
 data:
-    global_sop_list_file_path: /Users/amitkumarmahapatra/Documents/projects/code-copy/data/global-sop.pdf
-    site_document_file_path: /Users/amitkumarmahapatra/Documents/projects/code-copy/data/hdfc-ergo-health-insurance.pdf
+    global_sop_list_file_path: /Users/amitkumarmahapatra/Documents/projects/genai-delta-generator/data/global-sop.pdf
+    site_document_file_path: /Users/amitkumarmahapatra/Documents/projects/genai-delta-generator/data/hdfc-ergo-health-insurance.pdf
 
 model:
     repo_id: "google/gemma-2-9b-it"
