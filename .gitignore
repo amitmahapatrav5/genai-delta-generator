@@ -9,6 +9,11 @@ wheels/
 # Virtual environments
 .venv
 
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
 # Environment variables
 .env
+
+# macOS file system
 .DS_Store
