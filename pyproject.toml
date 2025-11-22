@@ -1,0 +1,20 @@
+[project]
+name = "genai-delta-generator"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "langchain>=1.0.7",
+    "langchain-chroma>=1.0.0",
+    "langchain-community>=0.4.1",
+    "langchain-huggingface>=1.0.1",
+    "langchain-ollama>=1.0.0",
+    "langgraph>=1.0.3",
+    "notebook>=7.5.0",
+    "pandas>=2.3.3",
+    "pydantic>=2.12.4",
+    "pymupdf>=1.26.6",
+    "python-dotenv>=1.2.1",
+    "unstructured[docx,pdf]>=0.18.20",
+]
